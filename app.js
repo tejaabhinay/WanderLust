@@ -93,22 +93,21 @@ app.use((req,res,next)=>{
 //     res.send("Server started");
 // });
 
-app.use("/listings",listingsRouter);
-app.use("/listings/:id/reviews",reviewsRouter);
-app.use("/",userRouter);
+app.use("/listings", listingsRouter);
+app.use("/listings/:id/reviews", reviewsRouter);
+app.use("/", userRouter);
 
-app.use((err,req,res,next)=>{
-    let{statusCode=500}=err;
-    if(!err.message)err.message="Something went wrong!";
-    res.status(statusCode).render("error.ejs",{err});
-    //res.status(statusCode).send(message);
+// Home route (important for Render)
+app.get("/", (req, res) => {
+  res.redirect("/listings");
 });
-// ✅ Catch-all 404 handler
-app.use((req, res, next) => {
+
+// 404 Handler
+app.all("*", (req, res, next) => {
   next(new ExpressError(404, "Page Not Found!"));
 });
 
-// ✅ Centralized error handler
+// Error Handler
 app.use((err, req, res, next) => {
   console.log("🔥 Error caught:", err.message);
   const { statusCode = 500 } = err;
@@ -116,8 +115,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs", { err });
 });
 
-
-
-app.listen(8080, () => {
-  console.log("Server running on port 8080");
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
